@@ -94,8 +94,168 @@ haversine <- function(long1, lat1, long2, lat2, round = 3) {
 
 …
 
-### Exercise 6
+### Exercise 6 Calculate the distances between all pairs of Denny’s and La Quinta locations and save this variable as distance. Make sure to save this variable in THE dn_lq_ak data frame so that you can use it later.
 
-…
+``` r
+dn_lq_ak <- mutate(dn_lq_ak, distance = haversine(longitude.x,latitude.x, longitude.y, latitude.y, round = 3))
+```
 
-Add exercise headings as needed.
+### Exercise 7 Calculate the minimum distance between a Denny’s and La Quinta for each Denny’s location. To do so we group by Denny’s locations and calculate a new variable that stores the information for the minimum distance.
+
+``` r
+dn_lq_ak_mindist <- dn_lq_ak %>%
+  group_by(address.x) %>%
+  summarize(closest = min(distance))
+```
+
+### Exercise 8 Describe the distribution of the distances Denny’s and the nearest La Quinta locations in Alaska. Also include an appripriate visualization and relevant summary statistics.
+
+``` r
+mean(dn_lq_ak_mindist$closest)
+```
+
+    ## [1] 4.41
+
+``` r
+ggplot(data = dn_lq_ak_mindist, aes(x = closest)) +
+  geom_histogram()
+```
+
+    ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+
+![](lab-05_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+
+Range roughly between 2 and 6. Average distance is 4.41.
+
+### Exercise 9 Repeat the same analysis for North Carolina: (i) filter Denny’s and La Quinta Data Frames for NC, (ii) join these data frames to get a complete list of all possible pairings, (iii) calculate the distances between all possible pairings of Denny’s and La Quinta in NC, (iv) find the minimum distance between each Denny’s and La Quinta location, (v) visualize and describe the distribution of these shortest distances using appropriate summary statistics.
+
+``` r
+dn_NC <- dennys %>%
+  filter(state == "NC")
+nrow(dn_NC)
+```
+
+    ## [1] 28
+
+``` r
+lq_NC <- laquinta %>%
+  filter(state == "NC")
+nrow(lq_NC)
+```
+
+    ## [1] 12
+
+``` r
+dn_lq_NC <- full_join(dn_NC, lq_NC, by = "state")
+
+dn_lq_NC <- mutate(dn_lq_NC, distance = haversine(longitude.x,latitude.x, longitude.y, latitude.y, round = 3))
+
+dn_lq_NC_mindist <- dn_lq_NC %>%
+  group_by(address.x) %>%
+  summarize(closest = min(distance))
+
+mean(dn_lq_NC_mindist$closest)
+```
+
+    ## [1] 65.44432
+
+``` r
+ggplot(data = dn_lq_NC_mindist, aes(x = closest)) +
+  geom_histogram()
+```
+
+    ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+
+![](lab-05_files/figure-gfm/unnamed-chunk-8-1.png)<!-- --> There appears
+to be a positive skew with distance. Average distance is 65.4
+
+### Exercise 10 Repeat the same analysis for Texas.
+
+``` r
+dn_TX <- dennys %>%
+  filter(state == "TX")
+nrow(dn_TX)
+```
+
+    ## [1] 200
+
+``` r
+lq_TX <- laquinta %>%
+  filter(state == "TX")
+nrow(lq_TX)
+```
+
+    ## [1] 237
+
+``` r
+dn_lq_TX <- full_join(dn_TX, lq_TX, by = "state")
+
+dn_lq_TX <- mutate(dn_lq_TX, distance = haversine(longitude.x,latitude.x, longitude.y, latitude.y, round = 3))
+
+dn_lq_TX_mindist <- dn_lq_TX %>%
+  group_by(address.x) %>%
+  summarize(closest = min(distance))
+
+mean(dn_lq_TX_mindist$closest)
+```
+
+    ## [1] 5.7918
+
+``` r
+ggplot(data = dn_lq_TX_mindist, aes(x = closest)) +
+  geom_histogram()
+```
+
+    ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+
+![](lab-05_files/figure-gfm/unnamed-chunk-9-1.png)<!-- --> WOA! Major
+pos. skew. Average distance is 5.8.
+
+### Exercise 11 Repeat the same analysis for a state of your choosing, different than the ones we covered so far. (NH)
+
+``` r
+dn_NH <- dennys %>%
+  filter(state == "NH")
+nrow(dn_NH)
+```
+
+    ## [1] 3
+
+``` r
+lq_NH <- laquinta %>%
+  filter(state == "NH")
+nrow(lq_NH)
+```
+
+    ## [1] 2
+
+``` r
+dn_lq_NH <- full_join(dn_NH, lq_NH, by = "state")
+
+dn_lq_NH <- mutate(dn_lq_NH, distance = haversine(longitude.x,latitude.x, longitude.y, latitude.y, round = 3))
+
+dn_lq_NH_mindist <- dn_lq_NH %>%
+  group_by(address.x) %>%
+  summarize(closest = min(distance))
+
+mean(dn_lq_NH_mindist$closest)
+```
+
+    ## [1] 40.18667
+
+``` r
+ggplot(data = dn_lq_NH_mindist, aes(x = closest)) +
+  geom_histogram()
+```
+
+    ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+
+![](lab-05_files/figure-gfm/unnamed-chunk-10-1.png)<!-- --> Average
+distance is 40.2. No detectable pattern in the distribution.
+
+### Exercise 12 Among the states you examined, where is Mitch Hedberg’s joke most likely to hold true? Explain your reasoning.
+
+Texas, by far. Both the average distance and the distribution suggest
+that Dennys and La Quintas in the Lone Star state are very close to each
+other. Not only are there more pairs, but they’re closer together
+compared to North Carolina and New Hampshire.
